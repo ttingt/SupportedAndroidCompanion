@@ -2,7 +2,9 @@ package com.example.hazai.supported;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v7.app.ActionBarActivity;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,14 +17,15 @@ public class TextMessager extends Activity {
 
     private static final UUID SUPPORTED_PEBBLE_APP_UUID = UUID.fromString("TO-BE-UPDATED"); // TODO: UPDATE THIS PLEASE
     private PebbleKit.PebbleDataLogReceiver mDataLogReceiver = null;
+    private static String currentLocation = null;
+    private static final String HELPMESSAGE = "I am in trouble. Please send help to " + currentLocation;
 
-    private static final String HELPMESSAGE = "I am in trouble. Please send help to ";
-    private String location = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_text_messager);
+        getCurrentLocation();
     }
 
     @Override
@@ -53,9 +56,28 @@ public class TextMessager extends Activity {
     }
 
     // Get current location from phone GPS
-    private String getLocation() {
+    private void getCurrentLocation() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        return "";
+        LocationListener locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                double lat = location.getLatitude();
+                double lon = location.getLongitude();
+                currentLocation = Double.toString(lat) + ", " + Double.toString(lon);
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            public void onProviderEnabled(String provider) {
+            }
+
+            public void onProviderDisabled(String provider) {
+            }
+        };
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
     }
+
 
 }
