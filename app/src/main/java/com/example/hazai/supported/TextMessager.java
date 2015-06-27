@@ -1,11 +1,14 @@
 package com.example.hazai.supported;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -30,6 +33,7 @@ public class TextMessager extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_text_messager);
         getCurrentLocation();
+        Log.i("Location", currentLocation);
     }
 
     @Override
@@ -59,18 +63,18 @@ public class TextMessager extends Activity {
                         // Get the current location of the user
                         String address = null;
                         for (int i = 0; i < MAX_LOCATION_TRIES; i++) {
-                            address = getLocation();
-                            if (address) break;
+                            address = currentLocation;
+                            if (address == null) break;
                         }
                         // TODO: if address cannot be determined
-                        if (address) {
-                            SmsManager smsm = SmsManager.getDefault();
-                            PendingIntent smsPI;
-                            String SENT = "SMS_SENT";
-                            smsPI = PendingIntent.getBroadcast(this,0,new Intent(SENT), 0);
-                            smsm.sendTextMessage(phoneNumber, null, HELPMESSAGE + address, smsPI, null);
-                            alertPebbleSMSSent();
-                            success = true;
+                        if (address == null) {
+//                            SmsManager smsm = SmsManager.getDefault();
+//                            PendingIntent smsPI;
+//                            String SENT = "SMS_SENT";
+//                            smsPI = PendingIntent.getBroadcast(this,0,new Intent(SENT), 0);
+//                            smsm.sendTextMessage(phoneNumber, null, HELPMESSAGE + address, smsPI, null);
+//                            alertPebbleSMSSent();
+//                            success = true;
                         } else {
                             attempts++;
                         }

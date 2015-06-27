@@ -1,17 +1,37 @@
 package com.example.hazai.supported;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 
-public class MainActivity extends ActionBarActivity {
-
+public class MainActivity extends Activity {
+    private String phoneNumber = "12062519197";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Button btnSendSMS = (Button) findViewById(R.id.btnSendSMS);
+        btnSendSMS.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                sendSMS(phoneNumber, "Hi You got a message!");
+
+                       /*here i can send message to emulator 5556. In Real device
+                                                               you can change number  */
+
+            }
+        });
+//        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("sms:"
+//                + phoneNumber)));
     }
 
     @Override
@@ -34,5 +54,11 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sendSMS(String phoneNumber, String message)
+    {
+        SmsManager sms = SmsManager.getDefault();
+        sms.sendTextMessage(phoneNumber, null, message, null, null);
     }
 }
