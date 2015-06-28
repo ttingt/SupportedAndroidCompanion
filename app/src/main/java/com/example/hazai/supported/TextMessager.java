@@ -34,11 +34,14 @@ public class TextMessager extends Activity {
     private static final String SENT_INTENT_STR = "sent";
     private static final String DLVR_INTENT_STR = "delivered";
 
-    private static final UUID SUPPORTED_PEBBLE_APP_UUID = UUID.fromString("1b2a4b25-e8af-44c2-a53a-2d63f80aceca"); // TODO: UPDATE THIS PLEASE
+    private static final UUID SUPPORTED_PEBBLE_APP_UUID = UUID.fromString("1b2a4b25-e8af-44c2-a53a-2d63f80aceca");
     private PebbleKit.PebbleDataLogReceiver mDataLogReceiver = null;
     private String currentLocation = null;
+
     private static final String HELPMESSAGE = "I am in trouble. Please send help to ";
-    private static final String FAMESSAGE = "I apologize! That was a false alarm! I am fine and in trouble. Please do not send help.";
+    private static final String FAMESSAGE = "I apologize! That was a false alarm! I am fine and not in trouble. Please do not send help.";
+    private final String POLICE_SMS_NUM = "12062519197"; // TODO: placeholdernumber atm, replace with local police sms number
+    private final String POLICE_PHONE_NUM = "12062519197"; // TODO: placeholdernumber atm, replace with local police phone number
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +59,14 @@ public class TextMessager extends Activity {
                 if (msg.equals(DICT_SOS_STR)) {
                     String[] emergencyPhoNums = getEmergencyContactNumbers();
                     for (String pn : emergencyPhoNums) {
-                        sendSOSSMSMessages(pn);
+                        sendSOSSMSMessage(pn);
                     }
+                    sendPoliceSMS();
+                    callPolice();
                 } else if (msg.equals(DICT_CXL_STR)) {
                     String[] emergencyPhoNums = getEmergencyContactNumbers();
                     for (String pn : emergencyPhoNums) {
-                        sendFASMSMessages(pn);
+                        sendFASMSMessage(pn);
                     }
                 }
                 PebbleKit.sendAckToPebble(getApplicationContext(), transactionId);
@@ -90,13 +95,28 @@ public class TextMessager extends Activity {
         }
     }
 
+    // Initiates call to Police
+    private void callPolice() {
+        Intent intent = new Intent(Intent.ACTION_CALL,Uri.parse(POLICE_PHONE_NUM));
+        try {
+            startActivity(intent);
+        } catch (android.content.ActivityNotFoundException e) {
+            Toast.makeText(getApplicationContext(), "Error, activity not found", Toasts.LENGTH_SHORT).show();
+        }
+    }
+
+    // Sends help message to Police sms number
+    private void sendPoliceSMS() {
+        sendSOSSMSMessage(POLICE_SMS_NUM);
+    }
+
     // Gets array of emergency contact phone numbers as strings
     private String[] getEmergencyContactNumbers() {
         return null;
     }
 
     // Send preset sms text message (HELPMESSAGE) to given phone number
-    private void sendSOSSMSMessages(String phoneNumber) {
+    private void sendSOSSMSMessage(String phoneNumber) {
         boolean success = false;
         int attempts = 0;
         String address = getCurrentLocation();
@@ -126,7 +146,7 @@ public class TextMessager extends Activity {
 
     // Send 'false alarm' text message (FAMESSAGE) to given phone number
     // Note: meant to be sent in case where SOS was indicated erroneously
-    private void sendFASMSMessages(String phoneNumber) {
+    private void sendFASMSMessage(String phoneNumber) {
         boolean success = false;
         int attempts = 0;
 
