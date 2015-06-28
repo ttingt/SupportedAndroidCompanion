@@ -65,8 +65,8 @@ public class TextMessager extends Activity {
     private PebbleKit.PebbleDataLogReceiver mDataLogReceiver = null;
 
     // Audio Recording Constants
-    private MediaRecorder myAudioRecorder;
-    private String outputFile = null;
+    private MediaRecorder audioRecorder;
+    private static String audioFile = null;
     private static final int NUM_RECORDINGS = 3;
     private static final int LEN_RECORDINGS = 10; // length in seconds of recordings
 
@@ -89,7 +89,7 @@ public class TextMessager extends Activity {
                         sendSOSSMSMessage(pn);
                     }
                     sendPoliceSMS();
-                    //startAudioRecording();
+                    startAudioRecording();
                     callPolice();
                 } else if (msg == DICT_CXL_STR) {
                     String[] emergencyPhoNums = getEmergencyContactNumbers();
@@ -129,26 +129,38 @@ public class TextMessager extends Activity {
     private void startAudioRecording() {
         for (int i=0; i<NUM_RECORDINGS; i++) {
             try {
-                outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording" + i + ".3gp";
-                myAudioRecorder = new MediaRecorder();
-                myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC); // ERROR LINE
-                myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP); // ERROR LINE
-                myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
-                myAudioRecorder.setOutputFile(outputFile);
-                // Start Recording
-                myAudioRecorder.prepare();
-                myAudioRecorder.start();
 
-                // Stop Recording
+                audioFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording" + i + ".3gpp";
+
+                audioRecorder = new MediaRecorder();
+                audioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                audioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                audioRecorder.setOutputFile(audioFile);
+                audioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+
+                // Start Recording
+                try {
+                    audioRecorder.prepare();
+                } catch (IOException e) {
+                    Toast.makeText(getApplicationContext(), "Audio recorder prep failed", Toast.LENGTH_SHORT).show();
+                }
+                audioRecorder.start();
+
+                // Delay stop
                 Handler h = new Handler();
                 h.postDelayed(new Runnable() {
                     public void run() {
                         int i = 1;
                     }
                 }, LEN_RECORDINGS);
-                myAudioRecorder.stop();
-                myAudioRecorder.release();
-                myAudioRecorder = null;
+
+
+                // Stop Recording
+                audioRecorder.stop();
+                audioRecorder.release();
+                audioRecorder = null;
+
+
             } catch (Exception e) {
                 Toast.makeText(getApplicationContext(), "Audio recorder error", Toast.LENGTH_SHORT).show();
             }
