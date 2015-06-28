@@ -20,41 +20,65 @@ import android.telephony.SmsManager;
 
 public class TextMessager extends Activity {
 
+    // Communication with Pebble Watch App: dictionary index constants
+    // For communications received from watch app:
+    private static final int DICT_MSG_INDEX = 0; // For emergency button on watch
+    private static final String DICT_SOS_STR = "sos";
+    private static final String DICT_CXL_STR = "falsealarm";
+    // For communications sent to watch app:
+    private static final int DICT_SENT_MSG_INDEX = 2; // To confirm sms sent status
+    private static final int DICT_DELIVERED_MSG_INDEX = DICT_SENT_MSG_INDEX + 1; // To confirm sms delivery status (whether the recipient's phone received it)
+
     private static final int MAX_LOCATION_TRIES = 2;
     private static final int MAX_SEND_TRIES = 15;
-    private static final int DICT_SENT_MSG_INDEX = 2; // Fixed array index for pebble watch to expect msg to be stored at in the communication's dictionary
     private static final String SENT_INTENT_STR = "sent";
-    private static final int DICT_DELIVERED_MSG_INDEX = DICT_SENT_MSG_INDEX + 1;
     private static final String DLVR_INTENT_STR = "delivered";
 
     private static final UUID SUPPORTED_PEBBLE_APP_UUID = UUID.fromString("1b2a4b25-e8af-44c2-a53a-2d63f80aceca"); // TODO: UPDATE THIS PLEASE
     private PebbleKit.PebbleDataLogReceiver mDataLogReceiver = null;
     private String currentLocation = null;
     private static final String HELPMESSAGE = "I am in trouble. Please send help to ";
-
+    private static final String FAMESSAGE = "I apologize! That was a false alarm! I am fine and in trouble. Please do not send help.";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_text_messager);
 
-        //fake method for testing
-        sendSMSMessages("12062519197");
+//      fake method for testing
+//      sendSMSMessages("12062519197");
 
         final Handler handler = new Handler();
-        mDataLogReceiver = new PebbleKit.PebbleDataLogReceiver(SUPPORTED_PEBBLE_APP_UUID) {
-
-            //@Override
-            public void receiveData(Context context, UUID suppUuid, String phoneNumber) {
-                // Send preset text message to given phoneNumber
-
-                sendSMSMessages(phoneNumber);
-
+        PebbleKit.registerReceivedDataHandler(this, new PebbleKit.PebbleDataReceiver(SUPPORTED_PEBBLE_APP_UUID) {
+            @Override
+            public void receiveData(final Context context, final int transactionId, final PebbleDictionary data) {
+                String msg = data.getUnsignedInteger(DICT_MSG_INDEX)+"";
+                if (msg.equals(DICT_SOS_STR)) {
+                    String[] emergencyPhoNums = getEmergencyContactNumbers();
+                    for (String pn : emergencyPhoNums) {
+                        sendSOSSMSMessages(pn);
+                    }
+                } else if (msg.equals(DICT_CXL_STR)) {
+                    String[] emergencyPhoNums = getEmergencyContactNumbers();
+                    for (String pn : emergencyPhoNums) {
+                        sendFASMSMessages(pn);
+                    }
+                }
+                PebbleKit.sendAckToPebble(getApplicationContext(), transactionId);
             }
-        };
+        });
 
-        PebbleKit.registerDataLogReceiver(this, mDataLogReceiver);
-        PebbleKit.requestDataLogsForApp(this, SUPPORTED_PEBBLE_APP_UUID);
+//        final Handler handler = new Handler();
+//        mDataLogReceiver = new PebbleKit.PebbleDataLogReceiver(SUPPORTED_PEBBLE_APP_UUID) {
+//
+//            //@Override
+//            public void receiveData(Context context, UUID suppUuid, String phoneNumber) {
+//                // Send preset text message to given phoneNumber
+//                sendSMSMessages(phoneNumber);
+//            }
+//        };
+//        PebbleKit.registerDataLogReceiver(this, mDataLogReceiver);
+//        PebbleKit.requestDataLogsForApp(this, SUPPORTED_PEBBLE_APP_UUID);
     }
 
     @Override
@@ -66,30 +90,16 @@ public class TextMessager extends Activity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        final Handler handler = new Handler();
-//        mDataLogReceiver = new PebbleKit.PebbleDataLogReceiver(SUPPORTED_PEBBLE_APP_UUID) {
-//
-//            //@Override
-//            public void receiveData(Context context, UUID suppUuid, String phoneNumber) {
-//                // Send preset text message to given phoneNumber
-//
-//                sendSMSMessages(phoneNumber);
-//
-//            }
-//        };
-//
-//        PebbleKit.registerDataLogReceiver(this, mDataLogReceiver);
-//        PebbleKit.requestDataLogsForApp(this, SUPPORTED_PEBBLE_APP_UUID);
+    // Gets array of emergency contact phone numbers as strings
+    private String[] getEmergencyContactNumbers() {
+        return null;
     }
 
-    private void sendSMSMessages(String phoneNumber) {
+    // Send preset sms text message (HELPMESSAGE) to given phone number
+    private void sendSOSSMSMessages(String phoneNumber) {
         boolean success = false;
         int attempts = 0;
         String address = getCurrentLocation();
-        boolean sendStatus = false;
 
         while (!success && attempts < MAX_SEND_TRIES) {
             try {
@@ -112,6 +122,23 @@ public class TextMessager extends Activity {
             }
         }
         if (!success) alertPebbleSMSSent(false);
+    }
+
+    // Send 'false alarm' text message (FAMESSAGE) to given phone number
+    // Note: meant to be sent in case where SOS was indicated erroneously
+    private void sendFASMSMessages(String phoneNumber) {
+        boolean success = false;
+        int attempts = 0;
+
+        while (!success && attempts < MAX_SEND_TRIES) {
+            try {
+                SmsManager smsm = SmsManager.getDefault();
+                smsm.sendTextMessage(phoneNumber, null, FAMESSAGE, null, null);
+                success = true;
+            } catch (Exception e) {
+                attempts++;
+            }
+        }
     }
 
     // SMS send status (pending intent) broadcast receiver
@@ -152,7 +179,6 @@ public class TextMessager extends Activity {
     // To be called once SMS to emergency contacts sent successfully.
     // Alerts Pebble Watch App that sms were sent successfully.
     private void alertPebbleSMSSent(boolean smsSentSuccess) {
-        // TODO: implement
         String msg = "false";
         if (smsSentSuccess) {
             msg = "true";
@@ -165,7 +191,6 @@ public class TextMessager extends Activity {
     // To be called once SMS delivered to emergency contacts
     // Alerts Pebble Watch App that sms were delivered successfully.
     private void alertPebbleSMSDelivered(boolean smsDeliverySuccess) {
-        // TODO: implement
         String msg = "false";
         if (smsDeliverySuccess) {
             msg = "true";
