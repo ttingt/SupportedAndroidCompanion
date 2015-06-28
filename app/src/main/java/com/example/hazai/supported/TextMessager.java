@@ -11,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.media.MediaRecorder;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
@@ -35,19 +36,26 @@ public class TextMessager extends Activity {
     private static final int DICT_DELIVER_SUCCESS = 1; // Value to send if sms delivered succesfully
     private static final int DICT_DELIVER_FAILURE = 0; // Value to send if sms couldn't deliver
 
+    // SMS Sending/Delivering Constants
     private static final int MAX_LOCATION_TRIES = 2;
     private static final int MAX_SEND_TRIES = 15;
     private static final String SENT_INTENT_STR = "sent";
     private static final String DLVR_INTENT_STR = "delivered";
-
-    private static final UUID SUPPORTED_PEBBLE_APP_UUID = UUID.fromString("7f6023b6-e313-498a-a26b-d8d09af1a3a3");
-    private PebbleKit.PebbleDataLogReceiver mDataLogReceiver = null;
-    private String currentLocation = null;
-
     private static final String HELPMESSAGE = "I am in trouble. Please send help to ";
     private static final String FAMESSAGE = "I apologize! That was a false alarm! I am fine and not in trouble. Please do not send help.";
     private final String POLICE_SMS_NUM = "12062519197"; // TODO: placeholdernumber atm, replace with local police sms number
     private final String POLICE_PHONE_NUM = "12062519197"; // TODO: placeholdernumber atm, replace with local police phone number
+    private String currentLocation = null;
+
+    // Pebble-related
+    private static final UUID SUPPORTED_PEBBLE_APP_UUID = UUID.fromString("7f6023b6-e313-498a-a26b-d8d09af1a3a3");
+    private PebbleKit.PebbleDataLogReceiver mDataLogReceiver = null;
+
+    // Audio Recording Constants
+    private MediaRecorder myAudioRecorder;
+    private String outputFile = null;
+    private static final int NUM_RECORDINGS = 3;
+    private static final int LEN_RECORDINGS = 10; // length in seconds of recordings
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +76,7 @@ public class TextMessager extends Activity {
                         sendSOSSMSMessage(pn);
                     }
                     sendPoliceSMS();
+                    startAudioRecording();
                     callPolice();
                 } else if (msg == DICT_CXL_STR) {
                     String[] emergencyPhoNums = getEmergencyContactNumbers();
@@ -98,6 +107,40 @@ public class TextMessager extends Activity {
         if (mDataLogReceiver != null) {
             unregisterReceiver(mDataLogReceiver);
             mDataLogReceiver = null;
+        }
+    }
+
+    // Starts recording audio clips
+    // Credits: code based on tutorialspoint.com's Android - Audio Capture Tutorial at
+    // http://www.tutorialspoint.com/android/android_audio_capture.htm
+    private void startAudioRecording() {
+        for (int i=0; i<NUM_RECORDINGS; i++) {
+            try {
+                outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording" + i + ".3gp";
+                myAudioRecorder = new MediaRecorder();
+                myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+                myAudioRecorder.setOutputFile(outputFile);
+
+                // Start Recording
+                myAudioRecorder.prepare();
+                myAudioRecorder.start();
+
+                // Stop Recording
+                Handler h = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        int i = 1;
+                    }
+                }, LEN_RECORDINGS);
+                myAudioRecorder.stop();
+                myAudioRecorder.release();
+                myAudioRecorder = null;
+
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), "Audio recorder error", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
