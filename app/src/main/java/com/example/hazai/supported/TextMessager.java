@@ -117,7 +117,13 @@ public class TextMessager extends Activity {
     // Alerts Pebble Watch App that sms were sent successfully.
     private void alertPebbleSMSSent(boolean smsSentSuccess) {
         // TODO: implement
-
+        String msg = "false";
+        if (smsSentSuccess) {
+            msg = "true";
+        }
+        PebbleDictionary data = new PebbleDictionary();
+        data.addString(2, msg);
+        PebbleKit.sendDataToPebble(getApplicationContext(), SUPPORTED_PEBBLE_APP_UUID, data);
     }
 
     // Get current location from phone GPS
