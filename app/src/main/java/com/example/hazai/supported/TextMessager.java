@@ -104,7 +104,7 @@ public class TextMessager extends Activity {
     // Initiates call to Police
     private void callPolice() {
         Intent intent = new Intent(Intent.ACTION_CALL);
-        callIntent.setData(Uri.parse(POLICE_PHONE_NUM));
+        intent.setData(Uri.parse(POLICE_PHONE_NUM));
         try {
             startActivity(intent);
         } catch (android.content.ActivityNotFoundException e) {

@@ -14,16 +14,18 @@
         android:layout_height="wrap_content"
         android:text="New Button"
         android:id="@+id/goToText"
-        android:layout_below="@+id/textView"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="122dp" />
+        android:layout_marginBottom="143dp" />
 
     <Button
         android:layout_width="wrap_content"
-        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Twitter Stories"
         android:id="@+id/goToTwitterStories"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="122dp" />
+        android:layout_below="@+id/textView"
+        android:layout_alignLeft="@+id/goToText"
+        android:layout_alignStart="@+id/goToText"
+        android:layout_marginTop="68dp" />
 
 </RelativeLayout>
