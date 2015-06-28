@@ -251,7 +251,7 @@ public class TextMessager extends Activity {
     // Alerts Pebble Watch App that sms were sent successfully.
     private void alertPebbleSMSSent(int smsSentSuccess) {
         PebbleDictionary data = new PebbleDictionary();
-        data.addString(DICT_SENT_MSG_INDEX, smsSentSuccess);
+        data.addInt32(DICT_SENT_MSG_INDEX, smsSentSuccess);
         PebbleKit.sendDataToPebble(getApplicationContext(), SUPPORTED_PEBBLE_APP_UUID, data);
     }
 
@@ -259,7 +259,7 @@ public class TextMessager extends Activity {
     // Alerts Pebble Watch App that sms were delivered successfully.
     private void alertPebbleSMSDelivered(int smsDeliverySuccess) {
         PebbleDictionary data = new PebbleDictionary();
-        data.addString(DICT_DELIVERED_MSG_INDEX, smsDeliverySuccess);
+        data.addInt32(DICT_DELIVERED_MSG_INDEX, smsDeliverySuccess);
         PebbleKit.sendDataToPebble(getApplicationContext(), SUPPORTED_PEBBLE_APP_UUID, data);
     }
 
