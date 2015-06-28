@@ -15,6 +15,25 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Connect to last known Pebble watch
+        boolean connected = PebbleKit.isWatchConnected(getApplicationContext());
+        Log.i(getLocalClassName(), "Pebble is " + (connected ? "connected" : "not connected"));
+        // Detect pebble connection
+        PebbleKit.registerPebbleConnectedReceiver(getApplicationContext(), new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i(getLocalClassName(), "Pebble connected.");
+            }
+        });
+        // Detect pebble disconnection
+        PebbleKit.registerPebbleDisconnectedReceiver(getApplicationContext(), new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i(getLocalClassName(), "Pebble disconnected.");
+            }
+        });
+
         setContentView(R.layout.activity_main);
         Button btnSendSMS = (Button) findViewById(R.id.goToText);
         btnSendSMS.setOnClickListener(new View.OnClickListener()
