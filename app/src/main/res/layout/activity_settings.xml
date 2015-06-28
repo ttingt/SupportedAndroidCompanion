@@ -23,14 +23,14 @@
         android:layout_marginTop="50dp" />
 
     <EditText
-    android:layout_width="233dp"
-    android:layout_height="wrap_content"
-    android:inputType="phone"
-    android:ems="10"
-    android:id="@+id/phone1"
-    android:layout_below="@+id/contactlistexpl"
-    android:layout_marginTop="40dp"
-    android:layout_gravity="center_horizontal" />
+        android:layout_width="233dp"
+        android:layout_height="wrap_content"
+        android:inputType="phone"
+        android:ems="10"
+        android:id="@+id/phone1"
+        android:layout_below="@+id/contactlistexpl"
+        android:layout_marginTop="40dp"
+        android:layout_gravity="center_horizontal" />
 
     <EditText
         android:layout_width="233dp"

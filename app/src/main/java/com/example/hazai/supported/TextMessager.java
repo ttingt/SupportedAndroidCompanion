@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.getpebble.android.kit.PebbleKit;
@@ -17,6 +18,7 @@ import com.getpebble.android.kit.util.PebbleDictionary;
 import java.util.UUID;
 import android.os.Handler;
 import android.telephony.SmsManager;
+import android.widget.Toast;
 
 public class TextMessager extends Activity {
 
@@ -55,7 +57,7 @@ public class TextMessager extends Activity {
         PebbleKit.registerReceivedDataHandler(this, new PebbleKit.PebbleDataReceiver(SUPPORTED_PEBBLE_APP_UUID) {
             @Override
             public void receiveData(final Context context, final int transactionId, final PebbleDictionary data) {
-                int msg = data.getUnsignedInteger(DICT_MSG_INDEX);
+                int msg = data.getInteger(DICT_MSG_INDEX).intValue();
                 if (msg == DICT_SOS_STR) {
                     String[] emergencyPhoNums = getEmergencyContactNumbers();
                     for (String pn : emergencyPhoNums) {
@@ -97,11 +99,11 @@ public class TextMessager extends Activity {
 
     // Initiates call to Police
     private void callPolice() {
-        Intent intent = new Intent(Intent.ACTION_CALL,Uri.parse(POLICE_PHONE_NUM));
+        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(POLICE_PHONE_NUM));
         try {
             startActivity(intent);
         } catch (android.content.ActivityNotFoundException e) {
-            Toast.makeText(getApplicationContext(), "Error, activity not found", Toasts.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Error, activity not found", Toast.LENGTH_SHORT).show();
         }
     }
 

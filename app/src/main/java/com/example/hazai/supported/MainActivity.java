@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
@@ -19,7 +20,7 @@ import android.widget.Button;
 import com.getpebble.android.kit.PebbleKit;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends ActionBarActivity {
     private String phoneNumber = "12062519197";
     public String currentLocation = "SSSSSSSSSSSSSSSSSSSSSS";
 
@@ -92,7 +93,8 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
+        // return true;
     }
 
     @Override
@@ -104,6 +106,8 @@ public class MainActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
