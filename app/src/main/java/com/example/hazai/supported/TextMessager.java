@@ -27,8 +27,8 @@ public class TextMessager extends Activity {
 
     private static final UUID SUPPORTED_PEBBLE_APP_UUID = UUID.fromString("TO-BE-UPDATED"); // TODO: UPDATE THIS PLEASE
     private PebbleKit.PebbleDataLogReceiver mDataLogReceiver = null;
-    private static String currentLocation = null;
-    private static final String HELPMESSAGE = "I am in trouble. Please send help to " + currentLocation;
+    private String currentLocation = null;
+    private static final String HELPMESSAGE = "I am in trouble. Please send help to ";
 
 
     @Override
@@ -36,7 +36,6 @@ public class TextMessager extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_text_messager);
         getCurrentLocation();
-        Log.i("Location", currentLocation);
     }
 
     @Override
@@ -70,7 +69,7 @@ public class TextMessager extends Activity {
     private void sendSMSMessages(String phoneNumber) {
         boolean success = false;
         int attempts = 0;
-        String address = currentLocation;
+        String address = getCurrentLocation();
         boolean sendStatus = false;
 
         while (!success && attempts < MAX_SEND_TRIES) {
@@ -122,9 +121,8 @@ public class TextMessager extends Activity {
     }
 
     // Get current location from phone GPS
-    private void getCurrentLocation() {
+    private String getCurrentLocation() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 double lat = location.getLatitude();
@@ -143,6 +141,7 @@ public class TextMessager extends Activity {
         };
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        return currentLocation;
     }
 
 

@@ -1,9 +1,7 @@
 package com.example.hazai.supported;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
-import android.support.v7.app.ActionBarActivity;
+
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.view.Menu;
@@ -18,7 +16,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button btnSendSMS = (Button) findViewById(R.id.btnSendSMS);
+        Button btnSendSMS = (Button) findViewById(R.id.goToText);
         btnSendSMS.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View v)
