@@ -7,17 +7,14 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.SEND_SMS" />
-<<<<<<< HEAD
-=======
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
->>>>>>> f1dcb2f35b97f3e94d662a6919160ddbc6df4800
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -36,10 +33,11 @@
             android:label="Settings"
             android:parentActivityName="MainActivity">
         </activity>
-        <activity
-            android:name=".TwitterPage"
-            android:label="@string/title_activity_twitter_page" >
-        </activity>
+        <!--<activity-->
+            <!--android:name=".TwitterPage"-->
+            <!--android:label="@string/title_activity_twitter_page" >-->
+        <!--</activity>-->
+
     </application>
 
 </manifest>

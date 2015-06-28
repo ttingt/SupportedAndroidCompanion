@@ -5,11 +5,13 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -33,12 +35,18 @@ public class MainActivity extends ActionBarActivity {
     private String phoneNumber = "12062519197";
     public String currentLocation = "SSSSSSSSSSSSSSSSSSSSSS";
 
+    //private SharedPreferences sharedPreferences;
+    //private String contact = "911";
     private String myGPS = "47.6492420,-122.3505970";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
+        //setColorOnPreference();
 
         // Connect to last known Pebble watch
         boolean connected = PebbleKit.isWatchConnected(getApplicationContext());
