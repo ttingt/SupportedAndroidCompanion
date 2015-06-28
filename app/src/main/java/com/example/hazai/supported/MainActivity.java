@@ -27,6 +27,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import Parser.ParseHospital;
+
 
 public class MainActivity extends Activity {
     private String phoneNumber = "12062519197";
@@ -61,21 +63,9 @@ public class MainActivity extends Activity {
         Button btnSendSMS = (Button) findViewById(R.id.goToText);
         btnSendSMS.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                getCurrentLocation();
-                sendSMS(phoneNumber, "My Location is at " + currentLocation);
-                Log.i("texting", currentLocation);
-
-                       /*here i can send message to emulator 5556. In Real device
-                                                               you can change number  */
-
-            }
-        });
-        Button btnSetLocation = (Button) findViewById(R.id.goToText);
-        btnSetLocation.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                getCurrentLocation();
-                sendSMS(phoneNumber, "My Location is at " + currentLocation);
                 new GetHospital().execute();
+              //  sendSMS(phoneNumber, "My Location is at " + currentLocation);
+
                 Log.i("texting", currentLocation);
 
                        /*here i can send message to emulator 5556. In Real device
@@ -83,6 +73,19 @@ public class MainActivity extends Activity {
 
             }
         });
+//        Button btnSetLocation = (Button) findViewById(R.id.goToText);
+//        btnSetLocation.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                getCurrentLocation();
+//                sendSMS(phoneNumber, "My Location is at " + currentLocation);
+//                new GetHospital().execute();
+//                Log.i("texting", currentLocation);
+//
+//                       /*here i can send message to emulator 5556. In Real device
+//                                                               you can change number  */
+//
+//            }
+//        });
 
 //        final Intent twitterIntent = new Intent(MainActivity.this, TwitterPage.class);
 //        Button goToStoryPage = (Button) findViewById(R.id.goToTwitterStories);
@@ -155,11 +158,11 @@ public class MainActivity extends Activity {
         protected String doInBackground(Void... params) {
 
             String listOfPlaces = "";
-//            try {
-                listOfPlaces = "Univeristy of Washington Medical Center: 1959 NE Pacific ";
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                listOfPlaces = makeRoutingCall("https://api.foursquare.com/v2/venues/search?ll=47.6492420,-122.3505970&client_id=BPKIFJQC1JBXO2NGVROY5E30MTTGLBBSRORZFMYTTWCI2WHB&client_secret=YQEOI4125F5KFVCIYWKABWATWZXFD25UL0VEN0LLIQWNPA1N&v=20150322&radius=3000&categoryId=4bf58dd8d48988d196941735&query=hospital");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             return listOfPlaces;
         }
@@ -175,7 +178,10 @@ public class MainActivity extends Activity {
         }
 
         protected void onPostExecute(String jSONOfPlaces) {
-            sendSMS(phoneNumber, jSONOfPlaces);
+            ParseHospital hospital = new ParseHospital();
+            String result = hospital.parse(jSONOfPlaces);
+          //  sendSMS(phoneNumber, result);
+            Log.i("testing",result);
         }
     }
 

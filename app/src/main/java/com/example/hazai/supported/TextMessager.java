@@ -36,7 +36,7 @@ public class TextMessager extends Activity {
     private static final String SENT_INTENT_STR = "sent";
     private static final String DLVR_INTENT_STR = "delivered";
 
-    private static final UUID SUPPORTED_PEBBLE_APP_UUID = UUID.fromString("1b2a4b25-e8af-44c2-a53a-2d63f80aceca");
+    private static final UUID SUPPORTED_PEBBLE_APP_UUID = UUID.fromString("7f6023b6-e313-498a-a26b-d8d09af1a3a3");
     private PebbleKit.PebbleDataLogReceiver mDataLogReceiver = null;
     private String currentLocation = null;
 
@@ -114,7 +114,9 @@ public class TextMessager extends Activity {
 
     // Gets array of emergency contact phone numbers as strings
     private String[] getEmergencyContactNumbers() {
-        return null;
+        String[] n = new String[1];
+        n[0] = "12062519197";
+        return n;
     }
 
     // Send preset sms text message (HELPMESSAGE) to given phone number
