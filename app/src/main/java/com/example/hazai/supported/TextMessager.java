@@ -25,11 +25,15 @@ public class TextMessager extends Activity {
     // Communication with Pebble Watch App: dictionary index constants
     // For communications received from watch app:
     private static final int DICT_MSG_INDEX = 0; // For emergency button on watch
-    private static final int DICT_SOS_STR = 1;
-    private static final int DICT_CXL_STR = 0;
+    private static final int DICT_SOS_STR = 1; // If received this as value from pebble watch on index 0, SOS!
+    private static final int DICT_CXL_STR = 0; // If received this as value from pebble watch on index 0, cxl the SOS!
     // For communications sent to watch app:
-    private static final int DICT_SENT_MSG_INDEX = 2; // To confirm sms sent status
+    private static final int DICT_SENT_MSG_INDEX = 1; // To confirm sms sent status
+    private static final int DICT_SENT_SUCCESS = 1; // Value to send if sms sent succesfully
+    private static final int DICT_SENT_FAILURE = 0; // Value to send if sms couldn't send
     private static final int DICT_DELIVERED_MSG_INDEX = DICT_SENT_MSG_INDEX + 1; // To confirm sms delivery status (whether the recipient's phone received it)
+    private static final int DICT_DELIVER_SUCCESS = 1; // Value to send if sms delivered succesfully
+    private static final int DICT_DELIVER_FAILURE = 0; // Value to send if sms couldn't deliver
 
     private static final int MAX_LOCATION_TRIES = 2;
     private static final int MAX_SEND_TRIES = 15;
@@ -143,7 +147,7 @@ public class TextMessager extends Activity {
                 attempts++;
             }
         }
-        if (!success) alertPebbleSMSSent(false);
+        if (!success) alertPebbleSMSSent(DICT_SENT_FAILURE);
     }
 
     // Send 'false alarm' text message (FAMESSAGE) to given phone number
@@ -169,16 +173,16 @@ public class TextMessager extends Activity {
         registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                boolean result = false;
+                int result = DICT_SENT_FAILURE;
                 switch (getResultCode()) {
                     case Activity.RESULT_OK:
-                        result = true;
+                        result = DICT_SENT_SUCCESS;
                         break;
                     case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
                     case SmsManager.RESULT_ERROR_RADIO_OFF:
                     case SmsManager.RESULT_ERROR_NULL_PDU:
                     case SmsManager.RESULT_ERROR_NO_SERVICE:
-                        result = false;
+                        result = DICT_SENT_FAILURE;
                         break;
                 }
                 alertPebbleSMSSent(result);
@@ -192,33 +196,32 @@ public class TextMessager extends Activity {
         registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                boolean result = true;
-                alertPebbleSMSDelivered(result);
+                alertPebbleSMSDelivered(DICT_DELIVER_SUCCESS);
             }
         }, new IntentFilter(DLVR_INTENT_STR));
     }
 
     // To be called once SMS to emergency contacts sent successfully.
     // Alerts Pebble Watch App that sms were sent successfully.
-    private void alertPebbleSMSSent(boolean smsSentSuccess) {
+    private void alertPebbleSMSSent(int smsSentSuccess) {
         String msg = "false";
-        if (smsSentSuccess) {
+        if (smsSentSuccess == DICT_SENT_SUCCESS) {
             msg = "true";
         }
         PebbleDictionary data = new PebbleDictionary();
-        data.addString(2, msg);
+        data.addString(DICT_SENT_MSG_INDEX, msg);
         PebbleKit.sendDataToPebble(getApplicationContext(), SUPPORTED_PEBBLE_APP_UUID, data);
     }
 
     // To be called once SMS delivered to emergency contacts
     // Alerts Pebble Watch App that sms were delivered successfully.
-    private void alertPebbleSMSDelivered(boolean smsDeliverySuccess) {
+    private void alertPebbleSMSDelivered(int smsDeliverySuccess) {
         String msg = "false";
-        if (smsDeliverySuccess) {
+        if (smsDeliverySuccess == DICT_DELIVER_SUCCESS) {
             msg = "true";
         }
         PebbleDictionary data = new PebbleDictionary();
-        data.addString(3, msg);
+        data.addString(DICT_DELIVERED_MSG_INDEX, msg);
         PebbleKit.sendDataToPebble(getApplicationContext(), SUPPORTED_PEBBLE_APP_UUID, data);
     }
 
