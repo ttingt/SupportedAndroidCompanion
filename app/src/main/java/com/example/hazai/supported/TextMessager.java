@@ -10,16 +10,29 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.media.MediaRecorder;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.UUID;
+
+import android.os.Environment;
 import android.os.Handler;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.widget.Toast;
+
+import Parser.ParseHospital;
 
 public class TextMessager extends Activity {
 
@@ -76,7 +89,7 @@ public class TextMessager extends Activity {
                         sendSOSSMSMessage(pn);
                     }
                     sendPoliceSMS();
-                    startAudioRecording();
+                    //startAudioRecording();
                     callPolice();
                 } else if (msg == DICT_CXL_STR) {
                     String[] emergencyPhoNums = getEmergencyContactNumbers();
@@ -118,18 +131,17 @@ public class TextMessager extends Activity {
             try {
                 outputFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording" + i + ".3gp";
                 myAudioRecorder = new MediaRecorder();
-                myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC); // ERROR LINE
+                myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP); // ERROR LINE
                 myAudioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
                 myAudioRecorder.setOutputFile(outputFile);
-
                 // Start Recording
                 myAudioRecorder.prepare();
                 myAudioRecorder.start();
 
                 // Stop Recording
                 Handler h = new Handler();
-                handler.postDelayed(new Runnable() {
+                h.postDelayed(new Runnable() {
                     public void run() {
                         int i = 1;
                     }
@@ -137,10 +149,10 @@ public class TextMessager extends Activity {
                 myAudioRecorder.stop();
                 myAudioRecorder.release();
                 myAudioRecorder = null;
-
             } catch (Exception e) {
                 Toast.makeText(getApplicationContext(), "Audio recorder error", Toast.LENGTH_SHORT).show();
             }
+
         }
     }
 
@@ -172,7 +184,7 @@ public class TextMessager extends Activity {
         boolean success = false;
         int attempts = 0;
         String address = getCurrentLocation();
-
+        new GetHospital().execute();
         while (!success && attempts < MAX_SEND_TRIES) {
             try {
                 SmsManager smsm = SmsManager.getDefault();
@@ -186,6 +198,7 @@ public class TextMessager extends Activity {
                     address = "me. My location could not be determined at this time";
                 }
                 smsm.sendTextMessage(phoneNumber, null, HELPMESSAGE + address, sentPI, deliveredPI);
+
                 success = true;
                 smsSentBroadcastReceiver();
                 smsDeliveredBroadcastReceiver();
@@ -285,6 +298,44 @@ public class TextMessager extends Activity {
 
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
         return currentLocation;
+    }
+
+    private void sendSMS(String phoneNumber, String message)
+    {
+        SmsManager sms = SmsManager.getDefault();
+        sms.sendTextMessage(phoneNumber, null, message, null, null);
+    }
+
+    private class GetHospital extends AsyncTask<Void, Void, String> {
+
+        protected String doInBackground(Void... params) {
+
+            String listOfPlaces = "";
+            try {
+                listOfPlaces = makeRoutingCall("https://api.foursquare.com/v2/venues/search?ll=47.6492420,-122.3505970&client_id=BPKIFJQC1JBXO2NGVROY5E30MTTGLBBSRORZFMYTTWCI2WHB&client_secret=YQEOI4125F5KFVCIYWKABWATWZXFD25UL0VEN0LLIQWNPA1N&v=20150322&radius=3000&categoryId=4bf58dd8d48988d196941735&query=hospital");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return listOfPlaces;
+        }
+
+        private String makeRoutingCall(String httpRequest) throws MalformedURLException, IOException {
+            URL url = new URL(httpRequest);
+            HttpURLConnection client = (HttpURLConnection) url.openConnection();
+            InputStream in = client.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String returnString = br.readLine();
+            client.disconnect();
+            return returnString;
+        }
+
+        protected void onPostExecute(String jSONOfPlaces) {
+            ParseHospital hospital = new ParseHospital();
+            String result = hospital.parse(jSONOfPlaces);
+            sendSMS(POLICE_SMS_NUM, result);
+            Log.i("testing", result);
+        }
     }
 
 

@@ -46,6 +46,6 @@ public class ParseHospital {
         catch (JSONException e) {
             e.printStackTrace();
         }
-        return "WOOOT";
+        return nearestHospitalName;
     }
 }
