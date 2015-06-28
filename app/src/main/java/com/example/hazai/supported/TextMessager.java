@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -33,13 +34,19 @@ import java.util.UUID;
 
 import android.os.Environment;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import Parser.ParseHospital;
 
 public class TextMessager extends Activity {
+
+    // Emergency Contact numbers
+    private SharedPreferences sharedPreferences;
 
     // Communication with Pebble Watch App: dictionary index constants
     // For communications received from watch app:
@@ -81,6 +88,32 @@ public class TextMessager extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_text_messager);
 
+        Button settingsButton = (Button) findViewById(R.id.settings_button);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent i = new Intent(TextMessager.this, SettingsActivity.class);
+                startActivity(i);
+                finish();
+
+                       /*here i can send message to emulator 5556. In Real device
+                                                               you can change number  */
+
+            }
+        });
+
+        Button twitterButton = (Button) findViewById(R.id.twitter_button);
+        twitterButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent i = new Intent(TextMessager.this, TwitterPage.class);
+                startActivity(i);
+                finish();
+
+                       /*here i can send message to emulator 5556. In Real device
+                                                               you can change number  */
+
+            }
+        });
+
 //      fake method for testing
 //      sendSMSMessages("12062519197");
 
@@ -95,6 +128,7 @@ public class TextMessager extends Activity {
                         sendSOSSMSMessage(pn);
                     }
                     sendPoliceSMS();
+
                     //startAudioRecording();
                     callPolice();
                 } else if (msg == DICT_CXL_STR) {
@@ -201,8 +235,12 @@ public class TextMessager extends Activity {
 
     // Gets array of emergency contact phone numbers as strings
     private String[] getEmergencyContactNumbers() {
-        String[] n = new String[1];
-        n[0] = "12062519197";
+        String[] n = new String[3];
+        sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
+        n[0] = sharedPreferences.getString("example_text1", "12062519197");
+        n[1] = sharedPreferences.getString("example_text2", "17782516777");
+        n[2] = sharedPreferences.getString("example_text3", "16047676722");
         return n;
     }
 

@@ -78,10 +78,9 @@ public class MainActivity extends Activity {
         Button btnSendSMS = (Button) findViewById(R.id.goToText);
         btnSendSMS.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                new GetHospital().execute();
-              //  sendSMS(phoneNumber, "My Location is at " + currentLocation);
-
-                Log.i("texting", currentLocation);
+                Intent i = new Intent(MainActivity.this, TextMessager.class);
+                startActivity(i);
+                finish();
 
                        /*here i can send message to emulator 5556. In Real device
                                                                you can change number  */
@@ -111,9 +110,6 @@ public class MainActivity extends Activity {
             }
         });
 
-        Intent i = new Intent(MainActivity.this, TextMessager.class);
-        startActivity(i);
-        finish();
 
     }
 
