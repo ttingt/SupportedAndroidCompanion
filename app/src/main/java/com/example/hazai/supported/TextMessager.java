@@ -25,8 +25,8 @@ public class TextMessager extends Activity {
     // Communication with Pebble Watch App: dictionary index constants
     // For communications received from watch app:
     private static final int DICT_MSG_INDEX = 0; // For emergency button on watch
-    private static final String DICT_SOS_STR = "sos";
-    private static final String DICT_CXL_STR = "falsealarm";
+    private static final int DICT_SOS_STR = 1;
+    private static final int DICT_CXL_STR = 0;
     // For communications sent to watch app:
     private static final int DICT_SENT_MSG_INDEX = 2; // To confirm sms sent status
     private static final int DICT_DELIVERED_MSG_INDEX = DICT_SENT_MSG_INDEX + 1; // To confirm sms delivery status (whether the recipient's phone received it)
@@ -57,15 +57,15 @@ public class TextMessager extends Activity {
         PebbleKit.registerReceivedDataHandler(this, new PebbleKit.PebbleDataReceiver(SUPPORTED_PEBBLE_APP_UUID) {
             @Override
             public void receiveData(final Context context, final int transactionId, final PebbleDictionary data) {
-                String msg = data.getUnsignedInteger(DICT_MSG_INDEX)+"";
-                if (msg.equals(DICT_SOS_STR)) {
+                int msg = data.getUnsignedInteger(DICT_MSG_INDEX);
+                if (msg == DICT_SOS_STR) {
                     String[] emergencyPhoNums = getEmergencyContactNumbers();
                     for (String pn : emergencyPhoNums) {
                         sendSOSSMSMessage(pn);
                     }
                     sendPoliceSMS();
                     callPolice();
-                } else if (msg.equals(DICT_CXL_STR)) {
+                } else if (msg == DICT_CXL_STR) {
                     String[] emergencyPhoNums = getEmergencyContactNumbers();
                     for (String pn : emergencyPhoNums) {
                         sendFASMSMessage(pn);
