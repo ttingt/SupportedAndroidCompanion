@@ -57,7 +57,7 @@ public class TextMessager extends Activity {
         PebbleKit.registerReceivedDataHandler(this, new PebbleKit.PebbleDataReceiver(SUPPORTED_PEBBLE_APP_UUID) {
             @Override
             public void receiveData(final Context context, final int transactionId, final PebbleDictionary data) {
-                int msg = data.getUnsignedInteger(DICT_MSG_INDEX);
+                int msg = data.getInteger(DICT_MSG_INDEX).intValue();
                 if (msg == DICT_SOS_STR) {
                     String[] emergencyPhoNums = getEmergencyContactNumbers();
                     for (String pn : emergencyPhoNums) {

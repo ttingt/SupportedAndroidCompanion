@@ -31,13 +31,7 @@ import java.net.URL;
 public class MainActivity extends Activity {
     private String phoneNumber = "12062519197";
     public String currentLocation = "SSSSSSSSSSSSSSSSSSSSSS";
-    /**
-     * FourSquare URLs. You must complete the client_id and client_secret with values
-     * you sign up for.
-     */
-    private static String FOUR_SQUARE_URL = "https://api.foursquare.com/v2/venues/explore";
-    private static String FOUR_SQUARE_CLIENT_ID = "BPKIFJQC1JBXO2NGVROY5E30MTTGLBBSRORZFMYTTWCI2WHB";
-    private static String FOUR_SQUARE_CLIENT_SECRET = "YQEOI4125F5KFVCIYWKABWATWZXFD25UL0VEN0LLIQWNPA1N";
+
     private String myGPS = "47.6492420,-122.3505970";
 
     @Override
@@ -151,13 +145,11 @@ public class MainActivity extends Activity {
         protected String doInBackground(Void... params) {
 
             String listOfPlaces = "";
-            try {
-                listOfPlaces = makeRoutingCall("https://api.foursquare.com/v2/venues/explore?ll=49.264865,-123.252782&" +
-                        "client_id=BPKIFJQC1JBXO2NGVROY5E30MTTGLBBSRORZFMYTTWCI2WHB&" +
-                        "client_secret=YQEOI4125F5KFVCIYWKABWATWZXFD25UL0VEN0LLIQWNPA1N&v=20150322&radius=2500&photos=1");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            try {
+                listOfPlaces = "Univeristy of Washington Medical Center: 1959 NE Pacific ";
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 
             return listOfPlaces;
         }
@@ -173,7 +165,7 @@ public class MainActivity extends Activity {
         }
 
         protected void onPostExecute(String jSONOfPlaces) {
-
+            sendSMS(phoneNumber, jSONOfPlaces);
         }
     }
 
