@@ -18,6 +18,7 @@ import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -89,7 +90,7 @@ public class TextMessager extends Activity {
                         sendSOSSMSMessage(pn);
                     }
                     sendPoliceSMS();
-                    startAudioRecording();
+                    //startAudioRecording();
                     callPolice();
                 } else if (msg == DICT_CXL_STR) {
                     String[] emergencyPhoNums = getEmergencyContactNumbers();
@@ -127,10 +128,11 @@ public class TextMessager extends Activity {
     // Credits: code based on tutorialspoint.com's Android - Audio Capture Tutorial at
     // http://www.tutorialspoint.com/android/android_audio_capture.htm
     private void startAudioRecording() {
-        for (int i=0; i<NUM_RECORDINGS; i++) {
+//        for (int i=0; i<NUM_RECORDINGS; i++) {
             try {
-
-                audioFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording" + i + ".3gpp";
+                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording.3gpp");
+                file.createNewFile();
+                audioFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recording"  + ".3gpp";
 
                 audioRecorder = new MediaRecorder();
                 audioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -172,7 +174,7 @@ public class TextMessager extends Activity {
 //                Toast.makeText(getApplicationContext(), "Audio recorder error", Toast.LENGTH_SHORT).show();
 //            }
 
-        }
+ //       }
     }
 
     // Initiates call to Police

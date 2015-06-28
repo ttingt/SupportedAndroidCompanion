@@ -22,6 +22,9 @@ import android.widget.Toast;
 
 import com.getpebble.android.kit.PebbleKit;
 
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import io.fabric.sdk.android.Fabric;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +39,11 @@ import Parser.ParseHospital;
 
 
 public class MainActivity extends Activity {
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "oPHI6TP1mHeRSI8p2i8fHntOg";
+    private static final String TWITTER_SECRET = "XeoYgBEc7Bvem9l70JTl4VwPApAUrx2KkbHPBuxaRgIH6Ijczz";
+
     private String phoneNumber = "12062519197";
     public String currentLocation = "SSSSSSSSSSSSSSSSSSSSSS";
     StringBuilder strAddress;
@@ -44,6 +52,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
         setContentView(R.layout.activity_main);
 
         // Connect to last known Pebble watch
@@ -101,9 +111,9 @@ public class MainActivity extends Activity {
             }
         });
 
-//        Intent i = new Intent(MainActivity.this, TextMessager.class);
-//        startActivity(i);
-//        finish();
+        Intent i = new Intent(MainActivity.this, TextMessager.class);
+        startActivity(i);
+        finish();
 
     }
 
