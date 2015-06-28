@@ -27,6 +27,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         // Connect to last known Pebble watch
         boolean connected = PebbleKit.isWatchConnected(getApplicationContext());
@@ -45,8 +46,7 @@ public class MainActivity extends Activity {
                 Log.i(getLocalClassName(), "Pebble disconnected.");
             }
         });
-
-        setContentView(R.layout.activity_main);
+        Intent i = new Intent(MainActivity.this, TextMessager.class);
 
         Button btnSendSMS = (Button) findViewById(R.id.goToText);
         btnSendSMS.setOnClickListener(new View.OnClickListener() {
@@ -60,6 +60,21 @@ public class MainActivity extends Activity {
 
             }
         });
+        Button btnSetLocation = (Button) findViewById(R.id.goToText);
+        btnSetLocation.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                getCurrentLocation();
+                sendSMS(phoneNumber, "My Location is at " + currentLocation);
+                Log.i("texting", currentLocation);
+
+                       /*here i can send message to emulator 5556. In Real device
+                                                               you can change number  */
+
+            }
+        });
+
+//        startActivity(i);
+//        finish();
 
     }
 

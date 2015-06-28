@@ -27,7 +27,7 @@ public class TextMessager extends Activity {
     private static final int DICT_DELIVERED_MSG_INDEX = DICT_SENT_MSG_INDEX + 1;
     private static final String DLVR_INTENT_STR = "delivered";
 
-    private static final UUID SUPPORTED_PEBBLE_APP_UUID = UUID.fromString("TO-BE-UPDATED"); // TODO: UPDATE THIS PLEASE
+    private static final UUID SUPPORTED_PEBBLE_APP_UUID = UUID.fromString("1b2a4b25-e8af-44c2-a53a-2d63f80aceca"); // TODO: UPDATE THIS PLEASE
     private PebbleKit.PebbleDataLogReceiver mDataLogReceiver = null;
     private String currentLocation = null;
     private static final String HELPMESSAGE = "I am in trouble. Please send help to ";
@@ -37,21 +37,10 @@ public class TextMessager extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_text_messager);
-        getCurrentLocation();
-    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mDataLogReceiver != null) {
-            unregisterReceiver(mDataLogReceiver);
-            mDataLogReceiver = null;
-        }
-    }
+        //fake method for testing
+        sendSMSMessages("12062519197");
 
-    @Override
-    protected void onResume() {
-        super.onResume();
         final Handler handler = new Handler();
         mDataLogReceiver = new PebbleKit.PebbleDataLogReceiver(SUPPORTED_PEBBLE_APP_UUID) {
 
@@ -66,6 +55,34 @@ public class TextMessager extends Activity {
 
         PebbleKit.registerDataLogReceiver(this, mDataLogReceiver);
         PebbleKit.requestDataLogsForApp(this, SUPPORTED_PEBBLE_APP_UUID);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mDataLogReceiver != null) {
+            unregisterReceiver(mDataLogReceiver);
+            mDataLogReceiver = null;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        final Handler handler = new Handler();
+//        mDataLogReceiver = new PebbleKit.PebbleDataLogReceiver(SUPPORTED_PEBBLE_APP_UUID) {
+//
+//            //@Override
+//            public void receiveData(Context context, UUID suppUuid, String phoneNumber) {
+//                // Send preset text message to given phoneNumber
+//
+//                sendSMSMessages(phoneNumber);
+//
+//            }
+//        };
+//
+//        PebbleKit.registerDataLogReceiver(this, mDataLogReceiver);
+//        PebbleKit.requestDataLogsForApp(this, SUPPORTED_PEBBLE_APP_UUID);
     }
 
     private void sendSMSMessages(String phoneNumber) {
@@ -83,7 +100,7 @@ public class TextMessager extends Activity {
                 Intent dlvrIntent = new Intent(DLVR_INTENT_STR);
                 PendingIntent deliveredPI = PendingIntent.getBroadcast(getApplicationContext(),0,dlvrIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                if (address != null) {
+                if (address == null  ) {
                     address = "me. My location could not be determined at this time";
                 }
                 smsm.sendTextMessage(phoneNumber, null, HELPMESSAGE + address, sentPI, deliveredPI);
@@ -126,7 +143,7 @@ public class TextMessager extends Activity {
         registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                result = true;
+                boolean result = true;
                 alertPebbleSMSDelivered(result);
             }
         }, new IntentFilter(DLVR_INTENT_STR));
@@ -150,7 +167,7 @@ public class TextMessager extends Activity {
     private void alertPebbleSMSDelivered(boolean smsDeliverySuccess) {
         // TODO: implement
         String msg = "false";
-        if (smsSentSuccess) {
+        if (smsDeliverySuccess) {
             msg = "true";
         }
         PebbleDictionary data = new PebbleDictionary();
