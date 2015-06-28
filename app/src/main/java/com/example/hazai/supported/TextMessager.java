@@ -207,24 +207,16 @@ public class TextMessager extends Activity {
     // To be called once SMS to emergency contacts sent successfully.
     // Alerts Pebble Watch App that sms were sent successfully.
     private void alertPebbleSMSSent(int smsSentSuccess) {
-        String msg = "false";
-        if (smsSentSuccess == DICT_SENT_SUCCESS) {
-            msg = "true";
-        }
         PebbleDictionary data = new PebbleDictionary();
-        data.addString(DICT_SENT_MSG_INDEX, msg);
+        data.addString(DICT_SENT_MSG_INDEX, smsSentSuccess);
         PebbleKit.sendDataToPebble(getApplicationContext(), SUPPORTED_PEBBLE_APP_UUID, data);
     }
 
     // To be called once SMS delivered to emergency contacts
     // Alerts Pebble Watch App that sms were delivered successfully.
     private void alertPebbleSMSDelivered(int smsDeliverySuccess) {
-        String msg = "false";
-        if (smsDeliverySuccess == DICT_DELIVER_SUCCESS) {
-            msg = "true";
-        }
         PebbleDictionary data = new PebbleDictionary();
-        data.addString(DICT_DELIVERED_MSG_INDEX, msg);
+        data.addString(DICT_DELIVERED_MSG_INDEX, smsDeliverySuccess);
         PebbleKit.sendDataToPebble(getApplicationContext(), SUPPORTED_PEBBLE_APP_UUID, data);
     }
 
