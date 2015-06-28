@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
                 Log.i(getLocalClassName(), "Pebble disconnected.");
             }
         });
-        Intent i = new Intent(MainActivity.this, TextMessager.class);
+
 
         Button btnSendSMS = (Button) findViewById(R.id.goToText);
         btnSendSMS.setOnClickListener(new View.OnClickListener() {
@@ -73,6 +73,16 @@ public class MainActivity extends Activity {
             }
         });
 
+//        final Intent twitterIntent = new Intent(MainActivity.this, TwitterPage.class);
+//        Button goToStoryPage = (Button) findViewById(R.id.goToTwitterStories);
+//        btnSetLocation.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                startActivity(twitterIntent);
+//                finish();
+//            }
+//        });
+
+//        Intent i = new Intent(MainActivity.this, TextMessager.class);
 //        startActivity(i);
 //        finish();
 
