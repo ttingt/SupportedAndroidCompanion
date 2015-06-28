@@ -6,6 +6,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -25,6 +27,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import android.os.Environment;
@@ -59,7 +63,8 @@ public class TextMessager extends Activity {
     private static final String FAMESSAGE = "I apologize! That was a false alarm! I am fine and not in trouble. Please do not send help.";
     private final String POLICE_SMS_NUM = "12062519197"; // TODO: placeholdernumber atm, replace with local police sms number
     private final String POLICE_PHONE_NUM = "12062519197"; // TODO: placeholdernumber atm, replace with local police phone number
-    private String currentLocation = null;
+    private String currentLocation = "47.6492420,-122.3505970";
+
 
     // Pebble-related
     private static final UUID SUPPORTED_PEBBLE_APP_UUID = UUID.fromString("7f6023b6-e313-498a-a26b-d8d09af1a3a3");
@@ -70,7 +75,7 @@ public class TextMessager extends Activity {
     private static String audioFile = null;
     private static final int NUM_RECORDINGS = 3;
     private static final int LEN_RECORDINGS = 10; // length in seconds of recordings
-
+    private StringBuilder strAddress;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,15 +164,16 @@ public class TextMessager extends Activity {
                 Handler h = new Handler();
                 h.postDelayed(new Runnable() {
                     public void run() {
-                        int i = 1;
+                        // Stop Recording
+                        audioRecorder.stop();
+                        audioRecorder.release();
+                        audioRecorder = null;
+//                        int i = 1;
                     }
                 }, LEN_RECORDINGS);
 
 
-                // Stop Recording
-                audioRecorder.stop();
-                audioRecorder.release();
-                audioRecorder = null;
+
 
 
 //            } catch (Exception e) {
@@ -204,7 +210,8 @@ public class TextMessager extends Activity {
     private void sendSOSSMSMessage(String phoneNumber) {
         boolean success = false;
         int attempts = 0;
-        String address = getCurrentLocation();
+        getMyLocationAddress(47.6492420,-122.3505970);
+        String address = strAddress.toString();
         new GetHospital().execute();
         while (!success && attempts < MAX_SEND_TRIES) {
             try {
@@ -353,9 +360,36 @@ public class TextMessager extends Activity {
 
         protected void onPostExecute(String jSONOfPlaces) {
             ParseHospital hospital = new ParseHospital();
+            getMyLocationAddress(hospital.parseLat(jSONOfPlaces), hospital.parseLon(jSONOfPlaces));
             String result = hospital.parse(jSONOfPlaces);
-            sendSMS(POLICE_SMS_NUM, result);
+            sendSMS(POLICE_SMS_NUM, result +": "+ strAddress.toString());
             Log.i("testing", result);
+        }
+    }
+    public void getMyLocationAddress(double lat, double lon) {
+
+        Geocoder geocoder= new Geocoder(this, Locale.ENGLISH);
+
+        try {
+
+            //Place your latitude and longitude
+            List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+
+            if(addresses != null) {
+
+                Address fetchedAddress = addresses.get(0);
+                strAddress = new StringBuilder();
+
+                for(int i=0; i<fetchedAddress.getMaxAddressLineIndex(); i++) {
+                    strAddress.append(fetchedAddress.getAddressLine(i)).append("\n");
+                }
+            }
+            else{
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "Could not get address..!", Toast.LENGTH_LONG).show();
         }
     }
 
