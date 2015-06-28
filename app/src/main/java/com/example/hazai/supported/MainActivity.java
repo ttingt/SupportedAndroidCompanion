@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.SmsManager;
@@ -19,11 +20,20 @@ import android.widget.Button;
 
 import com.getpebble.android.kit.PebbleKit;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 
 public class MainActivity extends ActionBarActivity {
     private String phoneNumber = "12062519197";
     public String currentLocation = "SSSSSSSSSSSSSSSSSSSSSS";
 
+    private String myGPS = "47.6492420,-122.3505970";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +76,7 @@ public class MainActivity extends ActionBarActivity {
             public void onClick(View v) {
                 getCurrentLocation();
                 sendSMS(phoneNumber, "My Location is at " + currentLocation);
+                new GetHospital().execute();
                 Log.i("texting", currentLocation);
 
                        /*here i can send message to emulator 5556. In Real device
@@ -143,5 +154,33 @@ public class MainActivity extends ActionBarActivity {
         return currentLocation;
     }
 
+    private class GetHospital extends AsyncTask<Void, Void, String> {
+
+        protected String doInBackground(Void... params) {
+
+            String listOfPlaces = "";
+//            try {
+                listOfPlaces = "Univeristy of Washington Medical Center: 1959 NE Pacific ";
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
+            return listOfPlaces;
+        }
+
+        private String makeRoutingCall(String httpRequest) throws MalformedURLException, IOException {
+            URL url = new URL(httpRequest);
+            HttpURLConnection client = (HttpURLConnection) url.openConnection();
+            InputStream in = client.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String returnString = br.readLine();
+            client.disconnect();
+            return returnString;
+        }
+
+        protected void onPostExecute(String jSONOfPlaces) {
+            sendSMS(phoneNumber, jSONOfPlaces);
+        }
+    }
 
 }
