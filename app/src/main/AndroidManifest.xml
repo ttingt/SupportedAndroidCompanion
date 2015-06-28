@@ -9,6 +9,9 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -32,6 +35,9 @@
             android:name=".TwitterPage"
             android:label="@string/title_activity_twitter_page" >
         </activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="2a5f40660ceda394ec6c6d23820b1a5e698fbab9" />
     </application>
 
 </manifest>

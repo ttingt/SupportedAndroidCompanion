@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.getpebble.android.kit.PebbleKit;
 
@@ -26,6 +29,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+import java.util.Locale;
 
 import Parser.ParseHospital;
 
@@ -33,7 +38,7 @@ import Parser.ParseHospital;
 public class MainActivity extends Activity {
     private String phoneNumber = "12062519197";
     public String currentLocation = "SSSSSSSSSSSSSSSSSSSSSS";
-
+    StringBuilder strAddress;
     private String myGPS = "47.6492420,-122.3505970";
 
     @Override
@@ -96,9 +101,9 @@ public class MainActivity extends Activity {
             }
         });
 
-        Intent i = new Intent(MainActivity.this, TextMessager.class);
-        startActivity(i);
-        finish();
+//        Intent i = new Intent(MainActivity.this, TextMessager.class);
+//        startActivity(i);
+//        finish();
 
     }
 
@@ -180,9 +185,42 @@ public class MainActivity extends Activity {
         protected void onPostExecute(String jSONOfPlaces) {
             ParseHospital hospital = new ParseHospital();
             String result = hospital.parse(jSONOfPlaces);
-          //  sendSMS(phoneNumber, result);
-            Log.i("testing",result);
+            getMyLocationAddress(hospital.parseLat(jSONOfPlaces), hospital.parseLon(jSONOfPlaces));
+            String streetAdd = strAddress.toString();
+            sendSMS(phoneNumber, result + ": "+streetAdd);
+            Log.i("testing", streetAdd);
         }
     }
+    public void getMyLocationAddress(double lat, double lon) {
 
+        Geocoder geocoder= new Geocoder(this, Locale.ENGLISH);
+
+        try {
+
+            //Place your latitude and longitude
+            List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+
+            if(addresses != null) {
+
+                Address fetchedAddress = addresses.get(0);
+                strAddress = new StringBuilder();
+
+                for(int i=0; i<fetchedAddress.getMaxAddressLineIndex(); i++) {
+                    strAddress.append(fetchedAddress.getAddressLine(i)).append("\n");
+                }
+
+
+            }
+
+            else{
+
+            }
+
+
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "Could not get address..!", Toast.LENGTH_LONG).show();
+        }
+    }
 }

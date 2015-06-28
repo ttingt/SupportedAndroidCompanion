@@ -137,6 +137,9 @@ public class TextMessager extends Activity {
                 audioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
                 audioRecorder.setOutputFile(audioFile);
                 audioRecorder.setAudioEncoder(MediaRecorder.OutputFormat.AMR_NB);
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), "Audio fail: first part", Toast.LENGTH_SHORT).show();
+            }
 
                 // Start Recording
                 try {
@@ -144,7 +147,11 @@ public class TextMessager extends Activity {
                 } catch (IOException e) {
                     Toast.makeText(getApplicationContext(), "Audio recorder prep failed", Toast.LENGTH_SHORT).show();
                 }
-                audioRecorder.start();
+                try {
+                    audioRecorder.start();
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "Audio recorder start fail", Toast.LENGTH_SHORT).show();
+                }
 
                 // Delay stop
                 Handler h = new Handler();
@@ -161,9 +168,9 @@ public class TextMessager extends Activity {
                 audioRecorder = null;
 
 
-            } catch (Exception e) {
-                Toast.makeText(getApplicationContext(), "Audio recorder error", Toast.LENGTH_SHORT).show();
-            }
+//            } catch (Exception e) {
+//                Toast.makeText(getApplicationContext(), "Audio recorder error", Toast.LENGTH_SHORT).show();
+//            }
 
         }
     }
